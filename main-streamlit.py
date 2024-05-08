@@ -92,7 +92,7 @@ def sample_rag_with_cohere(document_text):
     print("sending msg to cohere API")
     response = co.chat(
         model="command-r-plus",
-        message='''You are an expert RFP writer. You receive RFPs all day long. Your current task is to extract all the "questions" that we need to give an answer to in this document. Respond with a JSON object only. Example response:~~~{questions:[{idx: 1, question: "Please answer the questions asked in this bid event, including any file attachment uploads. Certain questions will require an answer in order to submit your response, while other questions are optional when they pertain to your company. Some questions require a specific answer which will be identified to you. You will be warned of disqualification if you answer with an unacceptable answer prior to submission."}, {idx:2:, question:"..."}, ...]}~~~
+        message='''You are an expert RFP writer. You receive RFPs all day long. Your current task is to extract the first 5 "questions" that we need to give an answer to in this document. Respond with a JSON object only. Example response:~~~{questions:[{idx: 1, question: "Please answer the questions asked in this bid event, including any file attachment uploads. Certain questions will require an answer in order to submit your response, while other questions are optional when they pertain to your company. Some questions require a specific answer which will be identified to you. You will be warned of disqualification if you answer with an unacceptable answer prior to submission."}, {idx:2:, question:"..."}, ...]}~~~
         ONLY return a valid JSON object (no other text is necessary), do not identify it as json, just return the object.''',
         documents=[
             {"text": document_text}
