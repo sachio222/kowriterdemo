@@ -71,16 +71,36 @@ def flag_keywords(text, keywords):
     return flagged_items
 
 
-def generate_report(questions, artifacts, flagged_keywords):
-    # Create DataFrames for each category
-    questions_df = pd.DataFrame({
-        "Questions": [questions]
-    }).style.set_properties(**{'text-align': 'left', 'white-space': 'pre-wrap', 'height': '500px', 'width': '100%'})
+# def generate_report(questions, artifacts, flagged_keywords):
+#     # Create DataFrames for each category
+#     questions_df = pd.DataFrame({
+#         "Questions": [questions]
+#     }).style.set_properties(**{'text-align': 'left', 'white-space': 'pre-wrap', 'height': '500px', 'width': '100%'})
 
+#     artifacts_df = pd.DataFrame({
+#         "Artifacts": [artifacts]
+#     }).style.set_properties(**{'text-align': 'left', 'white-space': 'pre-wrap', 'height': '500px', 'width': '100%'})
+
+#     keywords_df = pd.DataFrame({
+#         "Flagged Keywords": [', '.join(flagged_keywords)]
+#     }).style.set_properties(**{'text-align': 'left', 'white-space': 'pre-wrap', 'height': '500px', 'width': '100%'})
+
+#     return questions_df, artifacts_df, keywords_df
+
+def generate_report(parsed_json, artifacts, flagged_keywords):
+    # Extracting questions from JSON and creating a DataFrame
+    questions = parsed_json.get('questions', [])
+    questions_df = pd.DataFrame(questions)
+    if not questions_df.empty:
+        questions_df.set_index('idx', inplace=True)
+        questions_df.columns = ['Questions']  # Renaming the column for clarity
+
+    # Artifacts DataFrame creation remains unchanged
     artifacts_df = pd.DataFrame({
         "Artifacts": [artifacts]
     }).style.set_properties(**{'text-align': 'left', 'white-space': 'pre-wrap', 'height': '500px', 'width': '100%'})
 
+    # Keywords DataFrame creation remains unchanged
     keywords_df = pd.DataFrame({
         "Flagged Keywords": [', '.join(flagged_keywords)]
     }).style.set_properties(**{'text-align': 'left', 'white-space': 'pre-wrap', 'height': '500px', 'width': '100%'})
@@ -114,13 +134,13 @@ def parse_json_from_markdown(json_markdown):
         json_string = "{" + json_string
 
     # FIX THIS LATER
-    if not json_string.endswith('"/}]/}'):
-        json_string = json_string + '"/}]/}'
+    if not json_string.endswith("}"):
+        json_string = json_string + "}"
 
-    # parsed_json = json.loads(json_string)
+    parsed_json = json.loads(json_string)
     # print("json string", json_string)
-    return json_markdown
-    # return parsed_json
+    # return json_markdown
+    return parsed_json
 
 
 def main():
@@ -156,7 +176,7 @@ def main():
             artifacts = extract_artifacts(text_for_analysis)
             flagged_keywords = flag_keywords(text_for_analysis, keywords)
             questions_df, artifacts_df, keywords_df = generate_report(
-                questions, artifacts, flagged_keywords)
+                parse_json_from_markdown(questions), artifacts, flagged_keywords)
             st.write("Questions")
             st.dataframe(questions_df)
 
